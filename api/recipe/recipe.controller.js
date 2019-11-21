@@ -1,4 +1,4 @@
-import { Category } from "./category.model";
+import { Recipe } from "./recipe.model";
 import multer from "multer";
 import moment from "moment";
 
@@ -27,28 +27,27 @@ export const imageUpload = multer({
   fileFilter: fileFilter
 });
 
-export const createCategory = async (req, res) => {
+export const createRecipes = async (req, res) => {
   try {
     const data = req.body
 
     data.image = req.file.path;
-    console.log({data, file: req.file.path})
-    const create = await Category.create(data);
+    const create = await Recipe.create(data);
 
     res.status(200).send({done: true, data: create })
   } catch (err) {
     console.log(err)
-    res.status(422).send({done: false, error: "Error in create categories!"})
+    res.status(422).send({done: false, error: "Error in create recipes!"})
   }
 }
 
-export const getCategories = async (req, res) => {
+export const getRecipes = async (req, res) => {
   try {
-    const data = await Category.find({})
+    const data = await Recipe.find({})
 
     res.status(200).send({done: true, data})
   } catch (err) {
     console.log(err)
-    res.status(422).send({done: false, error: "Error in create categories!"})
+    res.status(422).send({done: false, error: "Error in getting recipes!"})
   }
 }
