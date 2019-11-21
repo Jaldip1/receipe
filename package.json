@@ -14,7 +14,7 @@
     "delay": 1000
   },
   "scripts": {
-    "dev:server": "nodemon --exec babel-node -- ./index.js",
+    "start": "nodemon --exec babel-node -- ./index.js",
     "build": "babel . -d build/server --copy-files --ignore node_modules"
   },
   "engines": {
