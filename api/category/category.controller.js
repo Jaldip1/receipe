@@ -1,7 +1,6 @@
-import { Category } from "./category.model";
 import multer from "multer";
 import moment from "moment";
-
+import { Category } from "./category.model";
 
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
@@ -27,7 +26,18 @@ export const imageUpload = multer({
   fileFilter: fileFilter
 });
 
-export const createCategory = async (req, res) => {
+export const getCategories = async (req, res) => {
+  try {
+    const data = await Category.find({})
+
+    res.status(200).send({done: true, data})
+  } catch (err) {
+    console.log(err)
+    res.status(422).send({done: false, error: "Error in create categories!"})
+  }
+}
+
+export const postCategory = async (req, res) => {
   try {
     const data = req.body
 
@@ -42,13 +52,34 @@ export const createCategory = async (req, res) => {
   }
 }
 
-export const getCategories = async (req, res) => {
+export const putCategory = async (req, res) => {
+  const { _id } = req.body
   try {
-    const data = await Category.find({})
+    if( !_id ){
+      return res.status(402).send({done: false, error: "please pass object id" })
+    }
 
-    res.status(200).send({done: true, data})
+    const create = await Category.update({_id}, {...req.body});
+
+    res.status(200).send({done: true, data: create })
   } catch (err) {
     console.log(err)
-    res.status(422).send({done: false, error: "Error in create categories!"})
+    res.status(422).send({done: false, error: "Error in create recipes!"})
+  }
+}
+
+export const deleteCategory = async (req, res) => {
+  const { _id } = req.params
+  try {
+    if( !_id ){
+      return res.status(402).send({done: false, error: "please pass object id" })
+    }
+
+    await Category.remove({_id});
+
+    res.status(200).send({done: true, message: "category removed successfully!" })
+  } catch (err) {
+    console.log(err)
+    res.status(422).send({done: false, error: "Error in remove category!"})
   }
 }

@@ -1,10 +1,12 @@
 import express from "express";
-import { createRecipes, getRecipes, imageUpload } from "./recipe.controller";
+import { getRecipes, postRecipes, putRecipes, deleteRecipes, imageUpload } from "./recipe.controller";
 
 export const recipeRouter = express.Router();
 
 recipeRouter.route("/")
   .get(getRecipes)
+  .post(imageUpload.single("image"), postRecipes)
+  .put(putRecipes)
 
-recipeRouter.route("/create")
-  .post(imageUpload.single("image"), createRecipes)
+recipeRouter.route("/:_id")
+  .delete(deleteRecipes)

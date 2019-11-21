@@ -1,10 +1,12 @@
 import express from "express";
-import { createCategory, getCategories, imageUpload } from "./category.controller";
+import { getCategories, postCategory, putCategory, deleteCategory, imageUpload } from "./category.controller";
 
 export const categoryRouter = express.Router();
 
 categoryRouter.route("/")
   .get(getCategories)
+  .post(imageUpload.single("image"), postCategory)
+  .put(putCategory)
 
-categoryRouter.route("/create")
-  .post(imageUpload.single("image"), createCategory)
+categoryRouter.route("/:_id")
+  .delete(deleteCategory)
