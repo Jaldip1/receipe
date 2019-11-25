@@ -27,10 +27,31 @@ export const imageUpload = multer({
 });
 
 export const getCategories = async (req, res) => {
+  const {pageSize, page} = req.query
   try {
-    const data = await Category.find({})
-
-    res.status(200).send({done: true, data})
+    let data = []
+    if (pageSize && page) {
+      data = await Category.aggregate([
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            image: 1,
+            updatedAt: 1,
+            createdAt: 1
+          }
+        },
+        {
+          $facet: {
+            metadata: [{ $count: "total" }, { $addFields: { pages: { $ceil: { $divide: ["$total", parseInt(pageSize)] } } } }],
+            data: [{ $sort: {updatedAt: -1} }, { $skip: page > 0 ? ( pageSize*page) : 0  }, { $limit: parseInt(pageSize) }]
+          }
+        }
+      ])
+    } else {
+      data = await Category.find({})
+    }
+    res.status(200).send(data)
   } catch (err) {
     console.log(err)
     res.status(422).send({done: false, error: "Error in create categories!"})

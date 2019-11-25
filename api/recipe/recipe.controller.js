@@ -29,10 +29,33 @@ export const imageUpload = multer({
 
 
 export const getRecipes = async (req, res) => {
+  const {pageSize, page} = req.query
   try {
-    const data = await Recipe.find({})
-
-    res.status(200).send({done: true, data})
+    let data = []
+    if (pageSize && page) {
+      data = await Recipe.aggregate([
+        {
+          $project: {
+            _id: 1,
+            recipeName: 1,
+            cookingTime: 1,
+            category: 1,
+            image: 1,
+            updatedAt: 1,
+            createdAt: 1
+          }
+        },
+        {
+          $facet: {
+            metadata: [{ $count: "total" }, { $addFields: { pages: { $ceil: { $divide: ["$total", parseInt(pageSize)] } } } }],
+            data: [{ $sort: {updatedAt: -1} }, { $skip: page > 0 ? ( pageSize*page) : 0  }, { $limit: parseInt(pageSize) }]
+          }
+        }
+      ])
+    } else {
+      data = await Recipe.find({})
+    }
+    res.status(200).send(data)
   } catch (err) {
     console.log(err)
     res.status(422).send({done: false, error: "Error in getting recipes!"})
